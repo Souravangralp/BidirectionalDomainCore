@@ -1,0 +1,114 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+
+
+  <PropertyGroup>
+
+    <TargetFramework>net10.0</TargetFramework>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <Nullable>enable</Nullable>
+
+    <RootNamespace>Bidirectional.DomainCore</RootNamespace>
+
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <NoWarn>$(NoWarn);CS8618;CS0105</NoWarn>
+
+  </PropertyGroup>
+
+
+
+  <ItemGroup>
+
+    <PackageReference Include="AutoMapper" Version="16.1.1" />
+
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
+
+    <PackageReference Include="MediatR" Version="14.0.0" />
+
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.10" />
+
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+
+      <PrivateAssets>all</PrivateAssets>
+
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+
+    </PackageReference>
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
+
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+
+      <PrivateAssets>all</PrivateAssets>
+
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+
+    </PackageReference>
+
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+
+    <PackageReference Include="HtmlSanitizer" Version="9.0.892" />
+
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+
+    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.7" />
+
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+
+    <Compile Remove="BidOnboard\Utilities\**\*.cs" />
+    <Compile Remove="Calculator\Utilities\**\*.cs" />
+    <Compile Remove="Postcode\Utilities\**\*.cs" />
+    <Compile Remove="ProductMatrix\Utilities\**\*.cs" />
+
+    <Compile Remove="**\EncryptColumnHelper.cs" />
+
+    <Compile Remove="BidOnboard\Entities\SoftDelete.cs" />
+
+    <Compile Remove="BidOnboard\Application\Constants\**\*.cs" />
+    <Compile Remove="BidOnboard\Application\Common\Constants\**\*.cs" />
+    <Compile Remove="BidOnboard\DependencyInjection\**\*.cs" />
+    <Compile Remove="Postcode\Exceptions\**\*.cs" />
+
+    <Compile Remove="ProductMatrix\Exceptions\**\*.cs" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="appsettings.Development.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="BidOnboard\Entities\Branches\" />
+    <Folder Include="BidOnboard\Entities\Users\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
+</Project>
+

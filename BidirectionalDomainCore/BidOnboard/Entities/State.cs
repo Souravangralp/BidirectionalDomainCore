@@ -1,3 +1,5 @@
+using Bidirectional.DomainCore.Postcode.Entities;
+
 namespace Bidirectional.DomainCore.BidOnboard.Entities;
 
 public class State : BaseAuditableEntity
@@ -14,9 +16,16 @@ public class State : BaseAuditableEntity
 
     public bool ISDefault { get; set; }
 
-    public string? Latitude { get; set; }
+    public double? Latitude { get; set; }
 
-    public string? Longitude { get; set; }
+    public double? Longitude { get; set; }
+
+    [Comment("Vic")]
+    public required string AbbreviatedName { get; set; }
+
+    public bool ISTerritory { get; set; }
 
     public Country? State_Country { get; set; } // Navigation property to the Country table (optional, if you want to store country information here too)
+
+    public List<Suburb> Suburbs { get; set; } = [];
 }

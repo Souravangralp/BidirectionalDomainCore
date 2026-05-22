@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Bidirectional.Application.Common.Interfaces;
+namespace Bidirectional.DomainCore.BidOnboard.Persistence.Abstractions;
 
 /// <summary>
 /// Provides functionality to validate text input against defined text policies for specific properties.

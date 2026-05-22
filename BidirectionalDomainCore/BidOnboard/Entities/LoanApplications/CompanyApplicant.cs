@@ -252,6 +252,27 @@ public class CompanyApplicant : BaseAuditableEntity
     public Address? Address { get; set; }
 
     /// <summary>
+    /// Gets the collection of addresses associated with the company applicant.
+    /// </summary>
+    [InverseProperty(nameof(Address.Address_CompanyApplicant))]
+    public List<Address> Addresses { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the public record information summary for Form009.
+    /// </summary>
+    public PublicRecordInformation? PublicRecordInformation { get; set; }
+
+    /// <summary>
+    /// Gets or sets the credit history snapshot for Form009.
+    /// </summary>
+    public CreditHistorySnapshot? CreditHistorySnapshot { get; set; }
+
+    /// <summary>
+    /// Gets the business credit enquiries associated with this company applicant.
+    /// </summary>
+    public IList<BusinessCreditEnquiry> BusinessCreditEnquiries { get; set; } = [];
+
+    /// <summary>
     /// Gets or sets the industry classification information.
     /// </summary>
     public IndustryClassification? IndustryClassifications { get; set; } // MST 009 108 Section 9e

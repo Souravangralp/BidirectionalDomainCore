@@ -1,3 +1,5 @@
+using Bidirectional.DomainCore.Calculator.Entities;
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
 using Bidirectional.DomainCore.ProductMatrix.Entities.Products;
 
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
@@ -27,7 +29,7 @@ public class DocTypeRequirementClassification : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the supplementary income evidence type lookup object.
     /// </summary>
-    public GeneralLookUp? SupplementaryIncomeEvidenceType_GeneralLookUp { get; set; }
+    public GeneralLookup? SupplementaryIncomeEvidenceType_GeneralLookUp { get; set; }
 
     /// <summary>
     /// Gets or sets the related council zoning category.

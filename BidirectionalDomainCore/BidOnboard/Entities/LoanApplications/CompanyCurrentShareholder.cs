@@ -12,6 +12,11 @@ public class CompanyCurrentShareholder : BaseAuditableEntity
     public int? CompanyCurrentShareholder_IntroductionToTheCustomerID { get; set; }
 
     /// <summary>
+    /// Gets or sets the identifier for the related company applicant (Form009).
+    /// </summary>
+    public int? CompanyCurrentShareholder_CompanyApplicantID { get; set; }
+
+    /// <summary>
     /// Gets or sets the full name of the shareholder.
     /// </summary>
     public string? ShareholderFullName { get; set; }
@@ -61,4 +66,9 @@ public class CompanyCurrentShareholder : BaseAuditableEntity
     /// Gets or sets the introduction to the customer entity related to this shareholder.
     /// </summary>
     public IntroductionToTheCustomer? CompanyCurrentShareholder_IntroductionToTheCustomer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the related company applicant for Form009.
+    /// </summary>
+    public CompanyApplicant? CompanyCurrentShareholder_CompanyApplicant { get; set; }
 }

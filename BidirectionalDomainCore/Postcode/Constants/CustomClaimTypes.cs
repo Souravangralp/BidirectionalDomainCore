@@ -16,6 +16,11 @@ public record CustomClaimTypes
     public const string BusinessUnitName = "businessUnitName";
 
     /// <summary>
+    /// Represents the raw identifier for a business unit.
+    /// </summary>
+    public const string RawBusinessUnitID = "rawBusinessUnitID";
+
+    /// <summary>
     /// Represents the unique identifier for an organization.
     /// </summary>
     public const string OrganizationID = "organizationID";
@@ -26,24 +31,19 @@ public record CustomClaimTypes
     public const string OrganizationName = "organizationName";
 
     /// <summary>
-    /// Represents the raw identifier for a branch, typically used for legacy or external systems.
+    /// Represents the raw identifier for an organization.
     /// </summary>
-    public const string RawBranchID = "rawBranchID";
+    public const string RawOrganizationID = "rawOrganizationID";
 
     /// <summary>
-    /// Represents the name of the branch.
+    /// Represents the unique identifier for an aggregator.
     /// </summary>
-    public const string BranchName = "branchName";
+    public const string AggregatorID = "aggregatorID";
 
     /// <summary>
-    /// Represents the raw identifier for a company, typically used for legacy or external systems.
+    /// Represents the raw identifier for an aggregator.
     /// </summary>
-    public const string RawCompanyID = "rawCompanyID";
-
-    /// <summary>
-    /// Represents the name of the company.
-    /// </summary>
-    public const string CompanyName = "companyName";
+    public const string RawAggregatorID = "rawAggregatorID";
 
     /// <summary>
     /// Represents the unique identifier for a group.
@@ -56,7 +56,7 @@ public record CustomClaimTypes
     public const string UserID = "userID";
 
     /// <summary>
-    /// Represents the raw identifier for a user, typically used for legacy or external systems.
+    /// Represents the raw identifier for a user.
     /// </summary>
     public const string RawUserID = "rawUserID";
 }

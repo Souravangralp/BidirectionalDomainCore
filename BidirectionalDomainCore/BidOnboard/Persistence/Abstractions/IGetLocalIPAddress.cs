@@ -1,4 +1,4 @@
-namespace Bidirectional.Application.Common.Interfaces;
+namespace Bidirectional.DomainCore.BidOnboard.Persistence.Abstractions;
 
 public interface IGetLocalIPAddress
 {

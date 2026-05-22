@@ -1,3 +1,4 @@
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
 using Bidirectional.DomainCore.ProductMatrix.Entities.Products;
 
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
@@ -33,5 +34,5 @@ public class FinancialAndEntityClassificationFilter : BaseAuditableEntity
     /// Gets or sets the general lookup entity associated with this filter.
     /// </summary>
     [ForeignKey(nameof(GeneralLookUpID))]
-    public GeneralLookUp? FinancialAndEntityClassificationFilter_GeneralLookUp { get; set; }
+    public GeneralLookup? FinancialAndEntityClassificationFilter_GeneralLookUp { get; set; }
 }

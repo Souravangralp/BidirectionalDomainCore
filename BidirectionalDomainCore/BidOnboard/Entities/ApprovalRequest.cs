@@ -1,3 +1,5 @@
+using Bidirectional.DomainCore.Calculator.Entities;
+
 namespace Bidirectional.DomainCore.BidOnboard.Entities;
 
 /// <summary>
@@ -5,6 +7,9 @@ namespace Bidirectional.DomainCore.BidOnboard.Entities;
 /// </summary>
 public class ApprovalRequest : BaseAuditableEntity
 {
+    /// <summary>Gets or sets the optional bulk approval request ID.</summary>
+    public int? ApprovalRequest_BulkApprovalRequestID { get; set; }
+
     /// <summary>
     /// Gets or sets the name of the table that contains the record for this approval request.
     /// </summary>
@@ -94,4 +99,10 @@ public class ApprovalRequest : BaseAuditableEntity
     /// Gets or sets the comment provided regarding the rollback action.
     /// </summary>
     public string? RolledBackComment { get; set; }
+
+    /// <summary>Gets or sets the optional fee type.</summary>
+    public string? FeeType { get; set; }
+
+    /// <summary>Gets or sets the optional bulk approval request.</summary>
+    public BulkApprovalRequest? ApprovalRequest_BulkApprovalRequest { get; set; }
 }

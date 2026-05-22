@@ -1,4 +1,4 @@
-using Bidirectional.Application.Common.Interfaces;
+using Bidirectional.DomainCore.BidOnboard.Persistence.Abstractions;
 using System.Reflection;
 
 namespace Bidirectional.DomainCore.BidOnboard.Infrastructure.Bid.Common.ServiceUtility;

@@ -11,6 +11,11 @@ public class CompanyBusinessProprietorship : BaseAuditableEntity
     public int? CompanyBusinessProprietorship_IntroductionToTheCustomerID { get; set; }
 
     /// <summary>
+    /// Gets or sets the foreign key for the related company applicant (Form009).
+    /// </summary>
+    public int? CompanyBusinessProprietorship_CompanyApplicantID { get; set; }
+
+    /// <summary>
     /// Gets or sets the name of the company business proprietorship.
     /// </summary>
     public string? Name { get; set; }
@@ -57,4 +62,9 @@ public class CompanyBusinessProprietorship : BaseAuditableEntity
     /// Gets or sets the related IntroductionToTheCustomer entity for this proprietorship.
     /// </summary>
     public IntroductionToTheCustomer? CompanyBusinessProprietorship_IntroductionToTheCustomer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the related company applicant for Form009.
+    /// </summary>
+    public CompanyApplicant? CompanyBusinessProprietorship_CompanyApplicant { get; set; }
 }

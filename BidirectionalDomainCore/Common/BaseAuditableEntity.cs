@@ -23,6 +23,11 @@ public abstract class BaseAuditableEntity : BaseEntity, ISoftDelete
     public DateTime? CreatedUtc { get; set; }
 
     /// <summary>
+    /// Gets or sets the date and time when the entity was created in Australian time.
+    /// </summary>
+    public DateTime CreatedAus { get; set; }
+
+    /// <summary>
     /// Gets or sets the identifier of the user who created the entity.
     /// </summary>
     public string? CreatedBy { get; set; }
@@ -31,6 +36,11 @@ public abstract class BaseAuditableEntity : BaseEntity, ISoftDelete
     /// Gets or sets the UTC timestamp when the entity was last modified.
     /// </summary>
     public DateTime? LastModifiedUtc { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the entity was last modified in Australian time.
+    /// </summary>
+    public DateTime? LastModifiedAus { get; set; }
 
     /// <summary>
     /// Gets or sets the identifier of the user who last modified the entity.

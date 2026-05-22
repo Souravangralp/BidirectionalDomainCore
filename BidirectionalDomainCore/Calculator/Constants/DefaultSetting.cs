@@ -6,6 +6,11 @@ namespace Bidirectional.DomainCore.Calculator.Constants;
 /// </summary>
 public record DefaultSetting
 {
+
+    public const int BookingPage = 10;
+
+    public const int AddMoreBookingPage = 15;
+
     /// <summary>Default document type (Full doc).</summary>
     public const string DefaultDocType = "Full doc";
 

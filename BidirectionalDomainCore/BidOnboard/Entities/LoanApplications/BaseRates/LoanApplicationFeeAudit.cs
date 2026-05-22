@@ -36,6 +36,8 @@ public class LoanApplicationFeeAudit : BaseAuditableEntity
     [TextClass(Ignored)]
     public string UpdatedByMethod { get; set; } = string.Empty;
 
+    public bool ISActuallyChange { get; set; }
+
     /// <summary>
     /// Gets or sets the related loan application fee.
     /// </summary>

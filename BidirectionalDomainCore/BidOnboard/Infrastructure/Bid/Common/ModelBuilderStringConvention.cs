@@ -291,6 +291,10 @@ public static class ModelBuilderStringConvention
         [TextFieldClass.Ignored] = new(255, true, AsciiPolicy.IgnoreSql.Key, nameof(AsciiPolicy.IgnoreSql)),
 
         [TextFieldClass.EntityAccessPolicyToken] = new(255, false, AsciiPolicy.EntityAccessPolicyTokenSql.Key, nameof(AsciiPolicy.EntityAccessPolicyTokenSql)),
+
+        [TextFieldClass.FormulaExpression] = new(300, true, AsciiPolicy.FormulaSql.Key, nameof(AsciiPolicy.FormulaSql)),
+
+        [TextFieldClass.UnicodeLettersWithSeparatorsPolicy] = new(255, true, AsciiPolicy.UnicodeLettersWithSeparatorsSql.Key, nameof(AsciiPolicy.UnicodeLettersWithSeparatorsSql)),
     };
 
     /// <summary>
@@ -910,6 +914,18 @@ public static class AsciiPolicy
         "PATINDEX(N'%[^A-Za-z0-9+/=]%', [{0}] COLLATE Latin1_General_BIN2) = 0",
         @"[\r\n]| {2,}|^(?:.*[^A-Za-z0-9+/=].*)$");
 
+    public static readonly KeyValuePair<string, string> FormulaSql = new(
+        "PATINDEX(N'%[^A-Za-z0-9_+*/().,<>= -]%', [{0}] COLLATE Latin1_General_BIN2) = 0",
+        @"[\r\n]|^(?:.*[^A-Za-z0-9_+*/().,<>= \-].*)$");
+
+    /// <summary>
+    /// SQL and regex policies for place names (letters, separators, parentheses); blocks control characters only.
+    /// Regex matches when invalid content is present (consistent with other <see cref="AsciiPolicy"/> pairs).
+    /// </summary>
+    public static readonly KeyValuePair<string, string> UnicodeLettersWithSeparatorsSql = new(
+        "PATINDEX(N'%[' + CHAR(0) + '-' + CHAR(31) + ']%', [{0}]) = 0",
+        @"[\x00-\x1F]|\r|\n");
+
     //public const string UrlSql =
     //    "%[^A-Za-z0-9:/?#\\[\\]@!$&'()*+,;=._~%-]%";
 
@@ -989,6 +1005,8 @@ public static class AsciiPolicy
         { nameof(HTMLSql), "Prevents HTML tags and unsafe script content in this column" },
         { nameof(AsciiOnlySql), "It is used when no rejex implemented" },
         { nameof(IgnoreSql), "It is used when no rejex implemented" },
+        { nameof(FormulaSql), "Allows calculator formula characters: letters, digits, underscore, operators (+ - * /), parentheses, decimal/comma, comparisons (< > =), and spaces" },
+        { nameof(UnicodeLettersWithSeparatorsSql), "Allows letters, digits, and common separators; blocks control characters only" },
     };
 
     /// <summary>
@@ -1014,7 +1032,9 @@ public static class AsciiPolicy
         { nameof(XMLPayloadSql), XMLPayloadSql },
         { nameof(AsciiOnlySql), AsciiOnlySql },
         { nameof(IgnoreSql), IgnoreSql },
-        { nameof(HTMLSql), HTMLSql }
+        { nameof(HTMLSql), HTMLSql },
+        { nameof(FormulaSql), FormulaSql },
+        { nameof(UnicodeLettersWithSeparatorsSql), UnicodeLettersWithSeparatorsSql }
     };
 
     /// <summary>

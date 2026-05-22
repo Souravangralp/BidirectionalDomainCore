@@ -20,6 +20,7 @@ public class Suburb : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the name of the suburb.
     /// </summary>
+    [TextClass(TextFieldClass.UnicodeLettersWithSeparatorsPolicy)]
     public required string Name { get; set; }
 
     /// <summary>

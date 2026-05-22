@@ -1,23 +1,4 @@
-using Bidirectional.DomainCore.BidOnboard.Assessment.Assignments;
-using Bidirectional.DomainCore.BidOnboard.Assessment.Attempts;
-using Bidirectional.DomainCore.BidOnboard.Assessment.Templates;
-using Bidirectional.DomainCore.BidOnboard.Entities.Branches;
-using Bidirectional.DomainCore.BidOnboard.Entities.Crms;
-using Bidirectional.DomainCore.BidOnboard.Entities.Generals.Countries;
-using Bidirectional.DomainCore.BidOnboard.Entities.Generals.Industries;
-using Bidirectional.DomainCore.BidOnboard.Entities.Generals.Occupations;
-using Bidirectional.DomainCore.BidOnboard.Entities.Generals;
-using Bidirectional.DomainCore.BidOnboard.Entities.Leads;
-using Bidirectional.DomainCore.BidOnboard.Entities.LoanApplications.BaseRates;
-using Bidirectional.DomainCore.BidOnboard.Entities.LoanApplications;
-using Bidirectional.DomainCore.BidOnboard.Entities.Modules;
-using Bidirectional.DomainCore.BidOnboard.Entities.Organizations;
-using Bidirectional.DomainCore.BidOnboard.Entities.RuleBasedNotifications;
-using Bidirectional.DomainCore.BidOnboard.Entities.UserActivity;
-using Bidirectional.DomainCore.BidOnboard.Entities.Users;
-using Bidirectional.DomainCore.BidOnboard.Entities.Valocity;
-using Bidirectional.DomainCore.BidOnboard.Entities;
-using Bidirectional.DomainCore.BidOnboard.Permission;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.Reflection;
 
 namespace Bidirectional.DomainCore.BidOnboard.Entities;
@@ -52,5 +33,26 @@ public static class SoftDelete
         where TEntity : class, ISoftDelete
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(x => !x.ISDeleted);
+    }
+
+    /// <summary>
+    /// Applies the standard soft-delete filter (<c>!ISDeleted</c>) to every mapped entity whose CLR type implements <see cref="ISoftDelete"/>.
+    /// Owned types and shadow-only types are skipped.
+    /// </summary>
+    /// <param name="modelBuilder">The model builder for the context.</param>
+    public static void ApplyGlobalSoftDeleteFilters(this ModelBuilder modelBuilder)
+    {
+        foreach (IEntityType entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (entityType.IsOwned())
+                continue;
+
+            Type? clrType = entityType.ClrType;
+            if (clrType is null || clrType == typeof(object))
+                continue;
+
+            if (typeof(ISoftDelete).IsAssignableFrom(clrType))
+                modelBuilder.SetSoftDelete(clrType);
+        }
     }
 }

@@ -5,18 +5,17 @@ namespace Bidirectional.DomainCore.Postcode.Entities.Generals;
 /// </summary>
 public class GeneralLookup : BaseAuditableEntity
 {
-    /// <summary>
-    /// Gets or sets the type of the general lookup.
-    /// </summary>
+    [TextClass(TextFieldClass.Ignored)]
     public required string Type { get; set; }
 
-    /// <summary>
-    /// Gets or sets the value associated with the general lookup.
-    /// </summary>
+    [TextClass(TextFieldClass.Ignored)]
     public required string Value { get; set; }
 
-    /// <summary>
-    /// Gets or sets a value indicating whether this lookup is the default.
-    /// </summary>
     public bool ISDefault { get; set; }
+
+    public int? Order { get; set; }
+
+    public List<LookupValueRelation> Parents { get; set; } = [];
+
+    public List<LookupValueRelation> Children { get; set; } = [];
 }

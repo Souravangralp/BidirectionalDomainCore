@@ -22,33 +22,23 @@
 
   <ItemGroup>
 
-    <PackageReference Include="AutoMapper" Version="16.1.1" />
+    <PackageReference Include="AutoMapper" />
 
-    <PackageReference Include="BouncyCastle.Cryptography" Version="2.6.2" />
+    <PackageReference Include="Azure.Extensions.AspNetCore.Configuration.Secrets" />
+    <PackageReference Include="Azure.Identity" />
+    <PackageReference Include="Azure.Security.KeyVault.Secrets" />
 
-    <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
 
-    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.10" />
+    <PackageReference Include="MediatR" />
 
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" />
 
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
 
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
 
-      <PrivateAssets>all</PrivateAssets>
-
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-
-    </PackageReference>
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.0" />
-
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
 
       <PrivateAssets>all</PrivateAssets>
 
@@ -56,20 +46,35 @@
 
     </PackageReference>
 
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="10.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
 
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" />
 
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 
-    <PackageReference Include="HtmlSanitizer" Version="9.0.892" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools">
 
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+      <PrivateAssets>all</PrivateAssets>
 
-    <PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.7" />
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+
+    </PackageReference>
+
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
+
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+
+    <PackageReference Include="HtmlSanitizer" />
+
+    <PackageReference Include="Newtonsoft.Json" />
+
+    <PackageReference Include="System.Security.Cryptography.Xml" />
 
   </ItemGroup>
 
@@ -84,14 +89,10 @@
 
     <Compile Remove="**\EncryptColumnHelper.cs" />
 
-    <Compile Remove="BidOnboard\Entities\SoftDelete.cs" />
-
     <Compile Remove="BidOnboard\Application\Constants\**\*.cs" />
     <Compile Remove="BidOnboard\Application\Common\Constants\**\*.cs" />
     <Compile Remove="BidOnboard\DependencyInjection\**\*.cs" />
     <Compile Remove="Postcode\Exceptions\**\*.cs" />
-
-    <Compile Remove="ProductMatrix\Exceptions\**\*.cs" />
 
   </ItemGroup>
 
@@ -107,8 +108,8 @@
   <ItemGroup>
     <Folder Include="BidOnboard\Entities\Branches\" />
     <Folder Include="BidOnboard\Entities\Users\" />
-    <Folder Include="Migrations\" />
+    <Folder Include="Common\Constants\" />
+    <Folder Include="ProductMatrix\Entities\Postcodes\" />
   </ItemGroup>
 
 </Project>
-

@@ -1,3 +1,4 @@
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
 using Bidirectional.DomainCore.ProductMatrix.Entities.Products;
 
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
@@ -30,5 +31,5 @@ public class MaritalStatusClassification : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the general lookup information for the marital status type.
     /// </summary>
-    public GeneralLookUp? MaritalStatusType_GeneralLookUp { get; set; }
+    public GeneralLookup? MaritalStatusType_GeneralLookUp { get; set; }
 }

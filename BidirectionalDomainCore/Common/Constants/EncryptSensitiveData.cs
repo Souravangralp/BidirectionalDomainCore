@@ -92,6 +92,7 @@ namespace Bidirectional.DomainCore.Common.Constants
               "email",
   
               // 3. Phone numbers
+              "phone",
               "PhoneNumber",
               "phoneNumber",
               "whatsAppNumber",
@@ -99,6 +100,7 @@ namespace Bidirectional.DomainCore.Common.Constants
               // 4. Government-issued IDs
               "migrantVisaNumber",
               "driverLicense",
+              "driverlicensenumber",
               "passport",
   
               // 5. Financial amounts in loan context
@@ -125,7 +127,14 @@ namespace Bidirectional.DomainCore.Common.Constants
               // 10. Bank/credit card details
               "creditCardCount",  // indicates financial exposure
               "creditLimit",
-              "amountCurrentlyOwing"
+              "amountCurrentlyOwing",
+
+              "firstname",
+              "lastname",
+              "fullname",
+              "name",
+              "passportnumber",
+              
             };
 
         /// <summary>

@@ -57,6 +57,15 @@ public record Worksheet
         /// <summary>Gets the ProductCategory sheet name.</summary>
         public const string ProductCategory = "ProductCategory";
 
+        /// <summary>Gets the EarlyRepaymentFee sheet name.</summary>
+        public const string EarlyRepaymentFee = "EarlyRepaymentFee";
+
+        /// <summary>Gets the DiscountPrepayment sheet name.</summary>
+        public const string DiscountPrepayment = "DiscountPrepayment";
+
+        /// <summary>Gets the DiscountSavingLimit sheet name.</summary>
+        public const string DiscountSavingLimit = "DiscountSavingLimit";
+
         /// <summary>Gets the ResidencyType sheet name.</summary>
         public const string ResidencyType = "ResidencyType";
 
@@ -120,6 +129,9 @@ public record Worksheet
 
         /// <summary>Gets the ApplicableFee sheet name.</summary>
         public const string ApplicableFee = "ApplicableFee";
+
+        /// <summary>Gets the FeeFloorByLoanType sheet name.</summary>
+        public const string FeeFloorByLoanType = "FeeFloorByLoanType";
     }
 
     /// <summary>Gets the sheet name for rate lock fee base data.</summary>

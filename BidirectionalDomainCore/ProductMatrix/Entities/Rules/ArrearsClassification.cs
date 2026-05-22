@@ -1,3 +1,4 @@
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
 using Bidirectional.DomainCore.ProductMatrix.Entities.Products;
 
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
@@ -40,7 +41,7 @@ public class ArrearsClassification : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the general lookup entity associated with the financial hardship type.
     /// </summary>
-    public GeneralLookUp? FinancialHardshipType_GeneralLookUp { get; set; }
+    public GeneralLookup? FinancialHardshipType_GeneralLookUp { get; set; }
 
     /// <summary>
     /// Gets or sets the council zoning category associated with this arrears classification.

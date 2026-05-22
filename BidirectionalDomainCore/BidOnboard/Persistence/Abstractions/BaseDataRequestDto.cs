@@ -69,4 +69,9 @@ public class BaseDataRequestDto
     /// Gets or sets an optional reference related to the request.
     /// </summary>
     public string? Reference { get; set; }
+
+    /// <summary>
+    /// Gets or sets the fee type associated with this base data record.
+    /// </summary>
+    public string? FeeType { get; set; }
 }

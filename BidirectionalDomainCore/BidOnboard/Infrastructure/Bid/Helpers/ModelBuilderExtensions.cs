@@ -1,4 +1,5 @@
 using Bidirectional.DomainCore.BidOnboard.Entities;
+using Bidirectional.DomainCore.Calculator.Entities;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Bidirectional.DomainCore.BidOnboard.Infrastructure.Bid.Helpers;
@@ -16,6 +17,10 @@ public static class ModelBuilderExtensions
     /// <param name="modelBuilder">The <see cref="ModelBuilder"/> to which the temporal table configuration will be applied.</param>
     public static void ApplyTemporalTableConfiguration(this ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<ApplicationVersion>()
+           .Property(p => p.ChangeVersionTime)
+           .HasDefaultValueSql("GETUTCDATE()");
+
         foreach (IMutableEntityType entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (!typeof(BaseEvent).IsAssignableFrom(entityType.ClrType) && typeof(ApprovalRequest).IsAssignableFrom(entityType.ClrType))

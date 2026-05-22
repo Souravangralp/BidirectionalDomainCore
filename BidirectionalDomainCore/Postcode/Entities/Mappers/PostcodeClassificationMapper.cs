@@ -18,7 +18,7 @@ public class PostcodeClassificationMapper : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the related postcode entity.
     /// </summary>
-    public Postcode? PostcodeClassificationMapper_Postcode { get; set; }
+    public Bidirectional.DomainCore.BidOnboard.Entities.Generals.Countries.Postcode? PostcodeClassificationMapper_Postcode { get; set; }
 
     /// <summary>
     /// Gets or sets the related postcode classification entity.

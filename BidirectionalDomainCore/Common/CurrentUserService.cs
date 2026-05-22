@@ -1,12 +1,9 @@
 ﻿using Bidirectional.Application.Common;
 using Bidirectional.DomainCore.BidOnboard.Persistence.Abstractions;
-using Bidirectional.DomainCore.Common.Constants;
+using Bidirectional.DomainCore.Postcode.Constants;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
 
 namespace Bidirectional.DomainCore.Common
 {
@@ -39,13 +36,13 @@ namespace Bidirectional.DomainCore.Common
 
         public string? UserName => GetClaimValue(ClaimTypes.Name);
 
-        public string? OrganizationID => GetClaimValue(CustomClaimTypes.CompanyID);
+        public string? OrganizationID => GetClaimValue(CustomClaimTypes.OrganizationID);
 
-        public int? RawOrganizationID => GetDecryptedIntClaim(CustomClaimTypes.RawCompanyID);
+        public int? RawOrganizationID => GetDecryptedIntClaim(CustomClaimTypes.RawOrganizationID);
 
-        public string? BusinessUnitID => GetClaimValue(CustomClaimTypes.BranchID);
+        public string? BusinessUnitID => GetClaimValue(CustomClaimTypes.BusinessUnitID);
 
-        public int? RawBusinessUnitID => GetDecryptedIntClaim(CustomClaimTypes.RawBranchID);
+        public int? RawBusinessUnitID => GetDecryptedIntClaim(CustomClaimTypes.RawBusinessUnitID);
 
         public string? AggregatorID => GetClaimValue(CustomClaimTypes.AggregatorID);
 

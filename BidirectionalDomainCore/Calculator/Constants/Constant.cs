@@ -108,6 +108,9 @@ public static class FeeType
     /// <summary>Offset account fee.</summary>
     public const string OffsetAccountFee = "Offset account fee";
 
+    /// <summary>Monthly fee.</summary>
+    public const string MonthlyFee = "Monthly Fee";
+
     /// <summary>Default application fee.</summary>
     public const string DefaultApplicationFee = "Default Application Fee";
 }

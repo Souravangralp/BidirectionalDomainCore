@@ -6,6 +6,15 @@ namespace Bidirectional.DomainCore.Calculator.Constants;
 /// </summary>
 public record GeneralLookUpTypesCoreDB
 {
+    /// <summary>High security type.</summary>
+    public const string HighSecurityType = "HighSecurity_Type";
+
+    /// <summary>PC category type".</summary>
+    public const string PCCategoryType = "PCCategory_Type";
+
+    /// <summary>Standard and poor type.</summary>
+    public const string StandardAndPoorType = "Standard_And_Poor_Type";
+
     /// <summary>Residency type look-up.</summary>
     public const string ResidencyType = "Residency_Type";
 
@@ -47,6 +56,8 @@ public record GeneralLookUpTypesCoreDB
 
     /// <summary>Borrowing entity type look-up.</summary>
     public const string BorrowingEntityType = "Borrowing_Entity_Type";
+
+    public const string LoanType = "Loan_Type";
 }
 
 /// <summary>

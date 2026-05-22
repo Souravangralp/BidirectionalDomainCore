@@ -9,7 +9,12 @@ public class PublicRecordInformation : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the foreign key linking to the associated IntroductionToTheCustomer entity.
     /// </summary>
-    public int PublicRecordInformation_IntroductionToTheCustomerID { get; set; }
+    public int? PublicRecordInformation_IntroductionToTheCustomerID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the foreign key linking to the associated company applicant (Form009 summary).
+    /// </summary>
+    public int? PublicRecordInformation_CompanyApplicantID { get; set; }
 
     /// <summary>
     /// Gets or sets the lookup ID for the type of public record information, referencing the GeneralLookUp table.
@@ -31,4 +36,9 @@ public class PublicRecordInformation : BaseAuditableEntity
     /// Gets or sets the related IntroductionToTheCustomer entity for this public record entry.
     /// </summary>
     public IntroductionToTheCustomer? PublicRecordInformation_IntroductionToTheCustomer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the related company applicant for Form009 public record summary.
+    /// </summary>
+    public CompanyApplicant? PublicRecordInformation_CompanyApplicant { get; set; }
 }

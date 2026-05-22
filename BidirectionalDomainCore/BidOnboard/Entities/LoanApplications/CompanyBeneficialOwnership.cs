@@ -12,6 +12,11 @@ public class CompanyBeneficialOwnership : BaseAuditableEntity
     public int? CompanyBeneficialOwnership_IntroductionToTheCustomerID { get; set; }
 
     /// <summary>
+    /// Gets or sets the identifier for the related company applicant (Form009).
+    /// </summary>
+    public int? CompanyBeneficialOwnership_CompanyApplicantID { get; set; }
+
+    /// <summary>
     /// Gets or sets the name and address of the beneficial owner.
     /// </summary>
     public string? BeneficialOwnerNameAndAddress { get; set; }
@@ -35,4 +40,9 @@ public class CompanyBeneficialOwnership : BaseAuditableEntity
     /// Gets or sets the related IntroductionToTheCustomer entity for the company beneficial ownership.
     /// </summary>
     public IntroductionToTheCustomer? CompanyBeneficialOwnership_IntroductionToTheCustomer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the related company applicant for Form009 beneficial ownership.
+    /// </summary>
+    public CompanyApplicant? CompanyBeneficialOwnership_CompanyApplicant { get; set; }
 }

@@ -1,11 +1,9 @@
 using AutoMapper;
-using Bidirectional.Application.Common.Interfaces;
 using Bidirectional.Application.Common.Models;
 using Bidirectional.Application.Common.StoredProcedure;
 using Bidirectional.DomainCore.BidOnboard.Assessment.Assignments;
 using Bidirectional.DomainCore.BidOnboard.Assessment.Attempts;
 using Bidirectional.DomainCore.BidOnboard.Assessment.Templates;
-using Bidirectional.DomainCore.BidOnboard.Entities;
 using Bidirectional.DomainCore.BidOnboard.Entities.Audit;
 using Bidirectional.DomainCore.BidOnboard.Entities.Crms;
 using Bidirectional.DomainCore.BidOnboard.Entities.Generals.Industries;
@@ -13,37 +11,44 @@ using Bidirectional.DomainCore.BidOnboard.Entities.Generals.Occupations;
 using Bidirectional.DomainCore.BidOnboard.Entities.Leads;
 using Bidirectional.DomainCore.BidOnboard.Entities.LoanApplications;
 using Bidirectional.DomainCore.BidOnboard.Entities.LoanApplications.BaseRates;
+using Bidirectional.DomainCore.BidOnboard.Entities.OnboardingWorkflows.OrganizationBusinessUnits;
+using Bidirectional.DomainCore.BidOnboard.Entities.OnboardingWorkflows.Users;
 using Bidirectional.DomainCore.BidOnboard.Entities.Organizations;
+using Bidirectional.DomainCore.BidOnboard.Entities.Permissions;
+using Bidirectional.DomainCore.BidOnboard.Entities.Privacy;
 using Bidirectional.DomainCore.BidOnboard.Entities.RuleBasedNotifications;
+using Bidirectional.DomainCore.BidOnboard.Entities.Settings;
 using Bidirectional.DomainCore.BidOnboard.Entities.UserActivity;
+using Bidirectional.DomainCore.BidOnboard.Entities.UserRepresentative;
 using Bidirectional.DomainCore.BidOnboard.Entities.Valocity;
 using Bidirectional.DomainCore.BidOnboard.Infrastructure.Bid.Common;
 using Bidirectional.DomainCore.BidOnboard.Infrastructure.Bid.Helpers;
+using Bidirectional.DomainCore.BidOnboard.Infrastructure.Onboarding.Helpers;
 using Bidirectional.DomainCore.BidOnboard.Permission;
 using Bidirectional.DomainCore.BidOnboard.Persistence.Abstractions;
-using Bidirectional.DomainCore.BidOnboard.Entities.OnboardingWorkflows.OrganizationBusinessUnits;
-using Bidirectional.DomainCore.BidOnboard.Entities.OnboardingWorkflows.Users;
-using Bidirectional.DomainCore.BidOnboard.Entities.Permissions;
-using Bidirectional.DomainCore.BidOnboard.Entities.Privacy;
-using Bidirectional.DomainCore.BidOnboard.Entities.UserRepresentative;
-using Bidirectional.DomainCore.BidOnboard.Infrastructure.Onboarding.Helpers;
+using Bidirectional.DomainCore.BidOnboard.Persistence.Interceptors;
+using Bidirectional.DomainCore.Calculator.Entities;
+using Bidirectional.DomainCore.Calculator.Entities.FeeCalculation;
 using Bidirectional.DomainCore.Persistence.Configurations.Bid;
 using Bidirectional.DomainCore.Persistence.Configurations.Onboarding;
+using Bidirectional.DomainCore.Persistence.Interceptors;
+using Bidirectional.DomainCore.Postcode.Entities;
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
+using Bidirectional.DomainCore.Postcode.Entities.Mappers;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Data.Common;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
 using Crm = Bidirectional.DomainCore.BidOnboard.Entities.Crms.Crm;
+using Document = Bidirectional.DomainCore.BidOnboard.Entities.LoanApplications.Document;
 
 namespace Bidirectional.DomainCore.Persistence;
 
@@ -54,15 +59,17 @@ public partial class PlatformDbContext : DbContext
 {
     #region Fields
 
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IGetLocalIPAddress _getLocalUserIPAddress;
-    private readonly IMediator _mediator;
-    private readonly ISecretProvider _azureKeyVaultService;
-    private readonly IMapper _mapper;
-    private readonly ILogger _logger = null!;
-    private readonly ITextPolicyService _textPolicyService;
+    private readonly ICurrentUserService? _currentUserService;
+    private readonly IGetLocalIPAddress? _getLocalUserIPAddress;
+    private readonly IMediator? _mediator;
+    private readonly ISecretProvider? _azureKeyVaultService;
+    private readonly IMapper? _mapper;
+    private readonly ILogger? _logger;
+    private readonly ITextPolicyService? _textPolicyService;
     private static readonly ConcurrentDictionary<IEntityType, IProperty[]> StringPropsCache = new();
     private readonly IConfiguration _configurationSection;
+    private readonly AuditableEntityInterceptor? _auditableEntitySaveChangesInterceptor;
+    private readonly SoftDeleteSaveChangesInterceptor? _softDeleteSaveChangesInterceptor;
 
     #endregion
 
@@ -99,16 +106,19 @@ public partial class PlatformDbContext : DbContext
         _logger = logger;
         _textPolicyService = textPolicyService;
         _configurationSection = configurationSection;
+        _auditableEntitySaveChangesInterceptor = new AuditableEntityInterceptor(currentUserService);
+        _softDeleteSaveChangesInterceptor = new SoftDeleteSaveChangesInterceptor();
     }
 
     /// <summary>
-    /// Lightweight constructor for onboarding-only hosts (Identity, seeding).
+    /// Design-time / migrations factory constructor; Key Vault and runtime services are optional.
     /// </summary>
+    /// <param name="options">EF Core context options.</param>
+    /// <param name="configurationSection">Application configuration.</param>
     public PlatformDbContext(DbContextOptions options, IConfiguration configurationSection)
         : base(options)
     {
         _configurationSection = configurationSection;
-        _logger = Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
     }
 
     #endregion
@@ -120,7 +130,7 @@ public partial class PlatformDbContext : DbContext
     /// <summary>
     /// Gets the DbSet for Domains.
     /// </summary>
-    public DbSet<Bidirectional.DomainCore.BidOnboard.Entities.Settings.Domain> Domains => Set<Bidirectional.DomainCore.BidOnboard.Entities.Settings.Domain>();
+    public DbSet<Domain> Domains => Set<Domain>();
 
     /// <summary>
     /// Gets the DbSet for other observations.
@@ -213,11 +223,6 @@ public partial class PlatformDbContext : DbContext
     /// Gets the DbSet for CRMs.
     /// </summary>
     public DbSet<Crm> Crms => Set<Crm>();
-
-    /// <summary>
-    /// Gets the DbSet for general lookups.
-    /// </summary>
-    public DbSet<Bidirectional.DomainCore.BidOnboard.Entities.Generals.GeneralLookup> GeneralLookups => Set<Bidirectional.DomainCore.BidOnboard.Entities.Generals.GeneralLookup>();
 
     /// <summary>
     /// Gets the DbSet for loan applications.
@@ -892,8 +897,6 @@ public partial class PlatformDbContext : DbContext
     /// </summary>
     public DbSet<CompanySummary> CompanySummaries => Set<CompanySummary>();
 
-    //public DbSet<CreditHistorySnapshot> CreditHistorySnapshots => Set<CreditHistorySnapshot>();
-
     //public DbSet<FileMessage> FileMessages => Set<FileMessage>();
 
     /// <summary>
@@ -1233,7 +1236,7 @@ public partial class PlatformDbContext : DbContext
     /// </summary>
     public DbSet<RepaymentHistory> RepaymentHistories => Set<RepaymentHistory>();
 
-    public DbSet<DefaultSetting> DefaultSettings => Set<DefaultSetting>();
+    public DbSet<Bidirectional.DomainCore.BidOnboard.Entities.DefaultSetting> DefaultSettings => Set<Bidirectional.DomainCore.BidOnboard.Entities.DefaultSetting>();
 
     /// <summary>
     /// Gets the collection of business identifier entities used for business or organizational identification within assessments.
@@ -1258,6 +1261,31 @@ public partial class PlatformDbContext : DbContext
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     public DbSet<Bidirectional.DomainCore.BidOnboard.Entities.Generals.Countries.Postcode> Postcodes => Set<Bidirectional.DomainCore.BidOnboard.Entities.Generals.Countries.Postcode>();
+
+    public DbSet<BusinessCreditEnquiry> BusinessCreditEnquiries => Set<BusinessCreditEnquiry>();
+
+    public DbSet<BusinessCreditEnquiryFactor> BusinessCreditEnquiryFactors => Set<BusinessCreditEnquiryFactor>();
+
+    public DbSet<CreditHistorySnapshot> CreditHistorySnapshots => Set<CreditHistorySnapshot>();
+
+    public DbSet<GeneralLookup> GeneralLookups => Set<GeneralLookup>();
+
+    public DbSet<LookupValueRelation> LookupValueRelations => Set<LookupValueRelation>();
+
+    /// <summary>
+    /// Gets the <see cref="DbSet{Suburb}"/> representing suburbs.
+    /// </summary>
+    public DbSet<Suburb> Suburbs => Set<Suburb>();
+
+    /// <summary>
+    /// Gets the <see cref="DbSet{PostcodeSuburbMapper}"/> representing postcode suburb mappers.
+    /// </summary>
+    public DbSet<PostcodeSuburbMapper> PostcodeSuburbMapper => Set<PostcodeSuburbMapper>();
+
+    /// <summary>
+    /// Gets the <see cref="DbSet{PostcodeClassificationMapper}"/> representing postcode classification mappers.
+    /// </summary>
+    public DbSet<PostcodeClassificationMapper> PostcodeClassificationMapper => Set<PostcodeClassificationMapper>();
 
     #endregion
 
@@ -1308,7 +1336,7 @@ public partial class PlatformDbContext : DbContext
         ApprovalRequest approvalRequest = approvalRequests.FirstOrDefault(x => x.UniqueID == uniqueID)
             ?? throw new KeyNotFoundException($"Approval request not found for UniqueID: {uniqueID}");
 
-        List<BaseDataRequestDto> approvalRequestsDto = _mapper.Map<List<BaseDataRequestDto>>(approvalRequests);
+        List<BaseDataRequestDto> approvalRequestsDto = _mapper!.Map<List<BaseDataRequestDto>>(approvalRequests);
 
         string tableName = approvalRequest.TableName ?? string.Empty;
 
@@ -1366,6 +1394,17 @@ public partial class PlatformDbContext : DbContext
         Dictionary<string, Type> tableToDtoMap = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase)
         {
             { "CoreProductSettings", typeof(ProductResponseDto) },
+            { "BaseIncrementRevertingRates", typeof(IncrementRateRevertingDto) },
+            { "BaseRevertingRates", typeof(BaseRevertingRateDto) },
+            { "DocTypeLoadings", typeof(DocTypeLoadingDto) },
+            { "LoadingPercentWithProducts", typeof(LoadingPercentProductDto) },
+            { "TargetBaseRates", typeof(TargetBaseRateDto) },
+            { "TargetComparisonMetrics", typeof(TargetComparisonRateDto) },
+            { "ProductLoadings", typeof(ProductLoadingDto) },
+            { "BaseValues", typeof(BaseValueDto) },
+            { "LegalFees", typeof(ProductLegalFeeDto) },
+            { "Fees", typeof(FloorFeeDto) },
+            { "FeeDetails", typeof(FeeDetailWithProductDto) },
         };
 
         if (entityList is null)
@@ -1374,7 +1413,7 @@ public partial class PlatformDbContext : DbContext
         if (!tableToDtoMap.TryGetValue(tableName, out Type? dtoType))
             throw new Exception($"No DTO mapping found for table: {tableName}");
 
-        object mappedDto = _mapper.Map(singleResult, singleResult?.GetType(), dtoType);
+        object mappedDto = _mapper!.Map(singleResult, singleResult?.GetType(), dtoType);
 
         //await GetAdditionalFieldValue(tableName, singleResult, mappedDto);
 
@@ -1384,6 +1423,90 @@ public partial class PlatformDbContext : DbContext
 
         return mappedDto ?? new();
     }
+
+    //[ExcludeFromCodeCoverage]
+    //private async Task GetAdditionalFieldValue(string tableName, object? singleResult, object mappedDto)
+    //{
+    //    List<GeneralLookUpGroupedDto> generalLookUps = await _generalLookUpService.GetGeneralLookUpsAsync([GeneralLookUpTypesCoreDB.DocType, GeneralLookUpTypesCoreDB.ResidencyType, GeneralLookUpTypesCoreDB.ProductType, GeneralLookUpTypesCoreDB.NumeralType]);
+
+    //    if (tableName == nameof(SectionName.BaseRevertingRates))
+    //    {
+    //        BaseRevertingRateDto baseRevertingRateDto = (BaseRevertingRateDto)mappedDto;
+
+    //        BaseRevertingRate? loadingPercentProductDto = (BaseRevertingRate?)singleResult;
+
+    //        if (loadingPercentProductDto != null)
+    //        {
+    //            baseRevertingRateDto.ProductName = GetProductNameWithCategoryAsync(generalLookUps, loadingPercentProductDto.ProductType_CoreDB_GeneralLookUpID, loadingPercentProductDto.NumeralType_CoreDB_GeneralLookUpID); // add product as well
+    //        }
+    //    }
+
+    //    if (tableName == nameof(SectionName.LoadingPercentWithProducts))
+    //    {
+    //        LoadingPercentProductDto productLoadingDto = (LoadingPercentProductDto)mappedDto;
+
+    //        LoadingPercentWithProduct? loadingPercentProduct = (LoadingPercentWithProduct?)singleResult;
+
+    //        if (loadingPercentProduct != null)
+    //        {
+    //            productLoadingDto.ProductName = GetProductNameWithCategoryAsync(generalLookUps, loadingPercentProduct.ProductType_CoreDB_GeneralLookUpID, loadingPercentProduct.NumeralType_CoreDB_GeneralLookUpID); // add product as well
+    //            productLoadingDto.GeneralLookUpValue = generalLookUps.GetValueByTypeAndId(GeneralLookUpTypesCoreDB.ResidencyType, loadingPercentProduct.LoadingID);
+    //        }
+    //    }
+
+    //    if (tableName == nameof(SectionName.ProductLoadings))
+    //    {
+    //        ProductLoadingDto productLoadingDto = (ProductLoadingDto)mappedDto;
+
+    //        ProductLoading? loadingPercentProductDto = (ProductLoading?)singleResult;
+
+    //        if (loadingPercentProductDto != null)
+    //        {
+    //            productLoadingDto.ProductName = GetProductNameWithCategoryAsync(generalLookUps, loadingPercentProductDto.ProductType_CoreDB_GeneralLookUpID, loadingPercentProductDto.NumeralType_CoreDB_GeneralLookUpID); // add product as well
+    //        }
+    //    }
+
+    //    if (tableName == nameof(SectionName.DocTypeLoadings))
+    //    {
+    //        DocTypeLoadingDto docTypeLoadingDto = (DocTypeLoadingDto)mappedDto;
+
+    //        DocTypeLoading? loadingPercentProductDto = (DocTypeLoading?)singleResult;
+
+    //        if (loadingPercentProductDto != null)
+    //        {
+    //            docTypeLoadingDto.DocType = generalLookUps.GetValueByTypeAndId(GeneralLookUpTypesCoreDB.DocType, loadingPercentProductDto.DocType_CoreDB_GeneralLookUpID);
+    //            docTypeLoadingDto.ProductName = GetProductNameWithCategoryAsync(generalLookUps, loadingPercentProductDto.ProductType_CoreDB_GeneralLookUpID, loadingPercentProductDto.NumeralType_CoreDB_GeneralLookUpID); // add product as well
+    //        }
+    //    }
+
+    //    if (tableName == nameof(SectionName.LegalFees))
+    //    {
+    //        ProductLegalFeeDto docTypeLoadingDto = (ProductLegalFeeDto)mappedDto;
+
+    //        LegalFee? loadingPercentProductDto = (LegalFee?)singleResult;
+
+    //        if (loadingPercentProductDto != null)
+    //        {
+    //            docTypeLoadingDto.Product = GetProductNameWithCategoryAsync(generalLookUps, loadingPercentProductDto.ProductType_GeneralLookUpID, loadingPercentProductDto.NumeralType_GeneralLookUpID); // add product as well
+    //        }
+    //    }
+
+    //    if (tableName == nameof(SectionName.FeeDetails))
+    //    {
+    //        FeeDetailWithProductDto feedetails = (FeeDetailWithProductDto)mappedDto;
+
+    //        FeeDetail? loadingPercentProductDto = (FeeDetail?)singleResult;
+
+    //        if (loadingPercentProductDto != null)
+    //        {
+    //            feedetails.ProductName = generalLookUps.GetValueByTypeAndId(GeneralLookUpTypesCoreDB.ProductType, loadingPercentProductDto.ProductType_CoreDB_GeneralLookUpID);
+    //        }
+    //    }
+    //}
+
+    //[ExcludeFromCodeCoverage]
+    //private string GetProductNameWithCategoryAsync(List<GeneralLookUpGroupedDto> generalLookUps, int? productID, int? numeralID) => $"{generalLookUps.GetValueByTypeAndId(GeneralLookUpTypesCoreDB.ProductType, productID)} {generalLookUps.GetValueByTypeAndId(GeneralLookUpTypesCoreDB.NumeralType, numeralID)}";
+
 
     /// <summary>
     /// Updates approved table data for the specified entity type using a list of approval requests.
@@ -1579,6 +1702,25 @@ public partial class PlatformDbContext : DbContext
             .WithMany()
             .HasForeignKey(x => x.RelatedToApplicantID);
 
+        builder.Entity<LookupValueRelation>()
+       .HasOne(x => x.Parent)
+       .WithMany(x => x.Children)
+       .HasForeignKey(x => x.ParentID)
+       .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<LookupValueRelation>()
+            .HasOne(x => x.Child)
+            .WithMany(x => x.Parents)
+            .HasForeignKey(x => x.ChildID)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<BaseValue>()
+                  .HasEnumStringConversion(b => b.ValueUnit)
+                  .HasDefaultValue(ValueUnit.None);
+
+        builder.Entity<LoadingPercentWithProduct>()
+                   .HasEnumStringConversion(b => b.LoadingType);
+
         builder.Entity<LoansOtherThanMortgage>()
             .HasEnumStringConversion(b => b.RefinancingStatus);
 
@@ -1652,11 +1794,22 @@ public partial class PlatformDbContext : DbContext
 
         CascadeDeleteHelper.OnModelCreating(builder);
 
-        EntitySchemaConvention.Apply(builder);
+        builder.ApplyGlobalSoftDeleteFilters();
 
         ModelBuilderStringConvention.ApplyStringPolicies(builder);
 
         ModelBuilderStringConvention.ValidateNoNVarCharMax(builder);
+
+        builder.Entity<BaseValue>()
+            .HasEnumStringConversion(b => b.ValueUnit)
+            .HasDefaultValue(ValueUnit.None);
+
+        builder.Entity<LoadingPercentWithProduct>()
+            .HasEnumStringConversion(b => b.LoadingType);
+
+        builder.Entity<Fee>()
+            .Navigation(f => f.FeeFloorByLoanTypes)
+            .AutoInclude();
 
         base.OnModelCreating(builder);
     }
@@ -1688,11 +1841,38 @@ public partial class PlatformDbContext : DbContext
     }
 
     /// <summary>
+    /// Configures the context, including interceptors for auditing.
+    /// </summary>
+    /// <param name="optionsBuilder">A builder for configuring context options.</param>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        List<IInterceptor> interceptors = new(capacity: 2);
+
+        if (_softDeleteSaveChangesInterceptor is not null)
+        {
+            interceptors.Add(_softDeleteSaveChangesInterceptor);
+        }
+
+        if (_auditableEntitySaveChangesInterceptor is not null)
+        {
+            interceptors.Add(_auditableEntitySaveChangesInterceptor);
+        }
+
+        if (interceptors.Count > 0)
+        {
+            optionsBuilder.AddInterceptors(interceptors);
+        }
+    }
+
+    /// <summary>
     /// Validates text policy compliance for string properties and logs possible violations.
     /// </summary>
     /// <param name="entries">A collection of entity entries to check.</param>
     protected virtual void DisplayStates(IEnumerable<EntityEntry> entries)
     {
+        if (_textPolicyService is null)
+            return;
+
         foreach (EntityEntry entry in entries)
         {
             if (entry.State != EntityState.Added &&
@@ -1708,17 +1888,15 @@ public partial class PlatformDbContext : DbContext
                 if (prop.CurrentValue is not string value || value.Length == 0)
                     continue;
 
-                try
-                {
-                    (bool isValid, TextFieldClass testClass, TextPolicy policy, TextPolicyViolation? violation) policy = _textPolicyService.IsValid(p.PropertyInfo!, p.Name, value);
+                (bool isValid, TextFieldClass testClass, TextPolicy policy, TextPolicyViolation? violation) policy =
+                    _textPolicyService.IsValid(p.PropertyInfo!, p.Name, value);
 
-                    if (!policy.isValid)
-                        throw new Exception(TextPolicyErrorFormatter.Build(entry.Metadata.Name, policy.testClass, policy.violation!.Value, policy.policy));
-                }
-                catch (Exception ex)
+                if (!policy.isValid)
                 {
-                    _logger.LogInformation("[BYPASS] EF_INTERCEPTOR: {Message} Property={PropertyName}", ex.Message, p.Name);
-                    //throw;
+                    _logger?.LogInformation(
+                        "[BYPASS] EF_INTERCEPTOR: {Message} Property={PropertyName}",
+                        TextPolicyErrorFormatter.Build(entry.Metadata.Name, policy.testClass, policy.violation!.Value, policy.policy),
+                        p.Name);
                 }
             }
         }
@@ -1765,180 +1943,6 @@ public partial class PlatformDbContext : DbContext
 
     //    return result;
     //}
-
-    #region Context overridden to save Audit log
-
-    /// <summary>
-    /// Performs logic to gather audit entries before saving changes.
-    /// </summary>
-    /// <returns>A list of <see cref="AuditEntry"/> objects that have temporary properties.</returns>
-    private List<AuditEntry> OnBeforeSaveChanges()
-    {
-        // Start overall stopwatch
-        Stopwatch overallStopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-        string user = _currentUserService?.UserID ?? "default";
-        string? userIPAddress = _getLocalUserIPAddress.GetLocalIPAddress();
-
-        // Detect changes - Stopwatch #1
-        Stopwatch detectChangesStopwatch = System.Diagnostics.Stopwatch.StartNew();
-        ChangeTracker.DetectChanges();
-        detectChangesStopwatch.Stop();
-        Console.WriteLine($"DetectChanges execution time: {detectChangesStopwatch.ElapsedMilliseconds} ms");
-
-        List<AuditEntry> auditEntries = new List<AuditEntry>();
-
-        Stopwatch loopStopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-        AddAuditLogEntry(user, userIPAddress, auditEntries);
-
-        Stopwatch saveStopwatch = System.Diagnostics.Stopwatch.StartNew();
-        foreach (AuditEntry? auditEntry in auditEntries.Where(a => !a.HasTemporaryProperties))
-        {
-            AuditLogs.Add(auditEntry.ToAudit());
-        }
-        saveStopwatch.Stop();
-        Console.WriteLine($"Saving audit entries execution time: {saveStopwatch.ElapsedMilliseconds} ms");
-
-        // Return entries with temporary properties for later processing - Stopwatch #5
-        Stopwatch temporaryEntriesStopwatch = System.Diagnostics.Stopwatch.StartNew();
-        List<AuditEntry> temporaryEntries = auditEntries.Where(a => a.HasTemporaryProperties).ToList();
-        temporaryEntriesStopwatch.Stop();
-        Console.WriteLine($"Temporary entries extraction time: {temporaryEntriesStopwatch.ElapsedMilliseconds} ms");
-
-        // Stop overall stopwatch
-        overallStopwatch.Stop();
-        Console.WriteLine($"Overall execution time: {overallStopwatch.ElapsedMilliseconds} ms");
-
-        return temporaryEntries;
-    }
-
-    /// <summary>
-    /// Adds audit log entries to the provided list based on the current change tracker state.
-    /// </summary>
-    /// <param name="user">The user making the changes.</param>
-    /// <param name="userIPAddress">The IP address of the user.</param>
-    /// <param name="auditEntries">The list of audit entries to populate.</param>
-    private void AddAuditLogEntry(string user, string? userIPAddress, List<AuditEntry> auditEntries)
-    {
-        foreach (EntityEntry entry in ChangeTracker.Entries())
-        {
-            if (entry.Entity is AuditLog || entry.State == EntityState.Detached || entry.State == EntityState.Unchanged)
-                continue;
-
-            AuditEntry auditEntry = new AuditEntry(entry)
-            {
-                AffectedTableName = entry.Metadata.GetTableName(),
-                User = user,
-                UserIPAddress = userIPAddress
-            };
-
-            auditEntries.Add(auditEntry);
-
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                ContractResolver = new DefaultContractResolver
-                {
-                    IgnoreSerializableAttribute = true
-                }
-            };
-
-            if (entry.State == EntityState.Added)
-            {
-                auditEntry.CurrentValues = JsonConvert.SerializeObject(entry.Entity, settings);
-                auditEntry.Action = EntityState.Added.ToString();
-            }
-            else if (entry.State == EntityState.Deleted)
-            {
-                auditEntry.PreviousValues = JsonConvert.SerializeObject(entry.GetDatabaseValues()?.ToObject(), settings);
-                auditEntry.Action = EntityState.Deleted.ToString();
-            }
-            else if (entry.State == EntityState.Modified)
-            {
-                var modifiedProperties = entry.Properties
-                    .Where(p => p.IsModified && !Equals(p.OriginalValue, p.CurrentValue))
-                    .Select(p => new
-                    {
-                        PropertyName = p.Metadata.Name,
-                        OriginalValue = p.OriginalValue,
-                        CurrentValue = p.CurrentValue
-                    }).ToList();
-
-                if (modifiedProperties.Any())
-                {
-                    auditEntry.PreviousValues = JsonConvert.SerializeObject(modifiedProperties.Select(p => new
-                    {
-                        p.PropertyName,
-                        p.OriginalValue
-                    }), settings);
-
-                    auditEntry.CurrentValues = JsonConvert.SerializeObject(modifiedProperties.Select(p => new
-                    {
-                        p.PropertyName,
-                        p.CurrentValue
-                    }), settings);
-
-                    auditEntry.Action = EntityState.Modified.ToString();
-                }
-                else
-                {
-                    auditEntries.Remove(auditEntry);
-                }
-            }
-
-        }
-    }
-
-    /// <summary>
-    /// Completes the audit log process after saving changes, including temporary property updates.
-    /// </summary>
-    /// <param name="auditEntries">The list of audit entries with temporary properties.</param>
-    /// <param name="cancellationToken">A cancellation token used for async operations.</param>
-    /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-    private async Task OnAfterSaveChanges(List<AuditEntry> auditEntries, CancellationToken cancellationToken)
-    {
-        if (auditEntries is null || auditEntries.Count == 0) return;
-
-        JsonSerializerSettings settings = new JsonSerializerSettings
-        {
-            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-        };
-
-        foreach (AuditEntry auditEntry in auditEntries)
-        {
-            // Update audit entries with temporary properties
-            foreach (PropertyEntry prop in auditEntry.TemporaryProperties)
-            {
-                if (prop.Metadata.IsPrimaryKey())
-                {
-                    auditEntry.ChangedKeyValues[prop.Metadata.Name] = prop?.CurrentValue ?? "";
-                }
-                else
-                {
-                    auditEntry.CurrentValues = SerializeEntity(prop.CurrentValue!, settings);
-                }
-            }
-
-            // Save the audit entry
-            AuditLogs.Add(auditEntry.ToAudit());
-        }
-
-        await base.SaveChangesAsync(cancellationToken);
-    }
-
-    /// <summary>
-    /// Serializes the supplied entity or property value using the provided serializer settings.
-    /// </summary>
-    /// <param name="entity">Object or property value to serialize.</param>
-    /// <param name="settings">JSON serializer settings.</param>
-    /// <returns>A string containing the serialized entity or property, or empty if value is null.</returns>
-    private string SerializeEntity(object entity, JsonSerializerSettings settings)
-    {
-        if (entity == null) return string.Empty;
-
-        return JsonConvert.SerializeObject(entity, settings);
-    }
 
     /// <summary>
     /// Executes a stored procedure asynchronously and maps the result set to a strongly-typed list.
@@ -2038,108 +2042,6 @@ public partial class PlatformDbContext : DbContext
             }
         }
     }
-
-    /// <summary>
-    /// Represents an internal audit log entry, including properties for tracking changes to entities.
-    /// </summary>
-    public class AuditEntry
-    {
-        #region  Ctor
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuditEntry"/> class for the specified entity entry.
-        /// </summary>
-        /// <param name="entry">Entity entry to attach to this audit entry.</param>
-        public AuditEntry(EntityEntry entry)
-        {
-            Entry = entry;
-        }
-
-        #endregion
-
-        #region Fields
-
-        /// <summary>
-        /// Gets the associated <see cref="EntityEntry"/>.
-        /// </summary>
-        public EntityEntry Entry { get; }
-
-        /// <summary>
-        /// Gets or sets the name of the affected table.
-        /// </summary>
-        public string? AffectedTableName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the action that was performed, such as "Added", "Deleted", or "Modified".
-        /// </summary>
-        public string? Action { get; set; }
-
-        /// <summary>
-        /// Gets a dictionary of changed key values for the audited entry.
-        /// </summary>
-        public Dictionary<string, object> ChangedKeyValues { get; } = new Dictionary<string, object>();
-
-        /// <summary>
-        /// Gets or sets the previous values as a serialized JSON string.
-        /// </summary>
-        public string? PreviousValues { get; set; }
-
-        /// <summary>
-        /// Gets or sets the current values as a serialized JSON string.
-        /// </summary>
-        public string? CurrentValues { get; set; }
-
-        /// <summary>
-        /// Gets the list of temporary property entries for the audited entity.
-        /// </summary>
-        public List<PropertyEntry> TemporaryProperties { get; } = new List<PropertyEntry>();
-
-        /// <summary>
-        /// Gets or sets the user responsible for the change.
-        /// </summary>
-        public string? User { get; set; }
-
-        /// <summary>
-        /// Gets or sets the user's IP address.
-        /// </summary>
-        public string? UserIPAddress { get; set; }
-
-        /// <summary>
-        /// Gets a value indicating whether this audit entry has temporary properties.
-        /// </summary>
-        public bool HasTemporaryProperties => TemporaryProperties.Any();
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// Converts this audit entry into an <see cref="BidAuditLog"/> entity for persistence.
-        /// </summary>
-        /// <returns>An <see cref="AuditLog"/> populated with audit entry information.</returns>
-        public AuditLog ToAudit()
-        {
-            AuditLog audit = new AuditLog
-            {
-                AffectedTableName = AffectedTableName,
-                Action = Action,
-                CreatedUtc = DateTime.UtcNow, //Save datetime in UTC
-                UserIPAddress = UserIPAddress,
-                ChangedKeyValues = JsonConvert.SerializeObject(ChangedKeyValues),
-                PreviousValues = PreviousValues,
-                CurrentValues = CurrentValues,
-                UserID = User,
-                AccessedUrl = "",
-                BrowserInfo = ""
-            };
-
-            return audit;
-        }
-
-        #endregion
-    }
-
-    #endregion
 
     /// <summary>
     /// Applies encryption configuration and loads encryption keys from configuration and Key Vault.

@@ -3,13 +3,8 @@ namespace Bidirectional.DomainCore.BidOnboard.Entities.Generals.Countries;
 /// <summary>
 /// Represents a postal code entity, including associated locality, state, and address information.
 /// </summary>
-public class Postcode
+public class Postcode : BaseAuditableEntity
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the postal code entity.
-    /// </summary>
-    public int ID { get; set; }
-
     /// <summary>
     /// Gets or sets the postal code.
     /// </summary>

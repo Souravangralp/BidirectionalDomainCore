@@ -36,10 +36,6 @@ public partial class PlatformDbContext
 
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
 
-    //public DbSet<GeneralLookUpType> GeneralLookUpTypes => Set<GeneralLookUpType>();
-
-    //public DbSet<GeneralLookUpValue> GeneralLookUpValues => Set<GeneralLookUpValue>();
-
     public DbSet<PhoneDetail> PhoneDetails => Set<PhoneDetail>();
 
     public DbSet<PreferredCommunicationDetail> PreferredCommunicationDetails => Set<PreferredCommunicationDetail>();

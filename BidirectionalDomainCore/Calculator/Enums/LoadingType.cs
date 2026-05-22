@@ -36,6 +36,11 @@ public enum LoadingType
     /// Represents loading based on borrowing entity type.
     /// </summary>
     BorrowingEntityType = 6,
+
+    /// <summary>
+    /// Represents loading based on loan type.
+    /// </summary>
+    LoanType = 7,
 }
 
 public static class LoadingTypeMapper
@@ -64,6 +69,7 @@ public static class LoadingTypeMapper
             GeneralLookUpTypesCoreDB.FacilityType => LoadingType.FacilityType,
             GeneralLookUpTypesCoreDB.ManagerDiscretionType => LoadingType.ManagerDiscretionType,
             GeneralLookUpTypesCoreDB.BorrowingEntityType => LoadingType.BorrowingEntityType,
+            GeneralLookUpTypesCoreDB.LoanType => LoadingType.LoanType,
             _ => throw new ArgumentOutOfRangeException(nameof(key), key, null)
         };
     }

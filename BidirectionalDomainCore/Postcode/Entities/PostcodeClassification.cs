@@ -19,4 +19,14 @@ public class PostcodeClassification : BaseAuditableEntity
     /// Gets or sets the identifier for the Standard and Poor type from the general lookup.
     /// </summary>
     public int? StandardAndPoorType_GeneralLookUpID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the descriptive name of the postcode classification.
+    /// </summary>
+    public required string Name { get; set; }
+
+    /// <summary>
+    /// Gets or sets the integer value associated with the postcode classification.
+    /// </summary>
+    public required int Value { get; set; }
 }

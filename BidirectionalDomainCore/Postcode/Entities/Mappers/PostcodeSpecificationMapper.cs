@@ -21,6 +21,26 @@ public class PostcodeSpecificationMapper : BaseAuditableEntity
     public int? PostcodeClassification_PCCategoryID { get; set; }
 
     /// <summary>
+    /// Gets or sets the Loan Type CoreDB General Lookup ID associated with the postcode.
+    /// </summary>
+    public int? LoanType_CoreDB_GeneralLookUpID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the PC Category Type CoreDB General Lookup ID associated with the postcode.
+    /// </summary>
+    public int? PCCategoryType_CoreDB_GeneralLookUpID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the High Security Type CoreDB General Lookup ID associated with the postcode.
+    /// </summary>
+    public int? HighSecurityType_CoreDB_GeneralLookUpID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Standard and Poor CoreDB General Lookup ID associated with the postcode.
+    /// </summary>
+    public int? StandardAndPoor_CoreDB_GeneralLookUpID { get; set; }
+
+    /// <summary>
     /// Gets or sets the PC Category postcode classification entity.
     /// </summary>
     public PostcodeClassification? PostcodeClassification_PCCategory { get; set; }

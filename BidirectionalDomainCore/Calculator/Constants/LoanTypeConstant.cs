@@ -11,3 +11,19 @@ public record RepaymentTypeCoreDBGeneralLookUp
     /// <summary>Interest-only repayment type ("io").</summary>
     public const string IO = "io";
 }
+
+public record LoanTypeConstant
+{
+    public const int Residential = 1498;
+
+    public const int Commercial = 1499;
+
+    public const int SMSFResidential = 1500;
+
+    public const int SMSFCommercial = 1501;
+}
+
+public record FeeTypeConstant
+{
+    public const int EstablishmentFee = 4;
+}

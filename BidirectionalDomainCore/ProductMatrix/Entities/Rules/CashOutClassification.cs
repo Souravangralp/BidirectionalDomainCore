@@ -1,3 +1,4 @@
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
 using Bidirectional.DomainCore.ProductMatrix.Entities.Products;
 
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
@@ -31,12 +32,12 @@ public class CashOutClassification : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the business finance general lookup entity related to the cash-out classification.
     /// </summary>
-    public GeneralLookUp? CashOutClassification_BusinessFinance_GeneralLookUp { get; set; }
+    public GeneralLookup? CashOutClassification_BusinessFinance_GeneralLookUp { get; set; }
 
     /// <summary>
     /// Gets or sets the cash-out type general lookup entity related to the cash-out classification.
     /// </summary>
-    public GeneralLookUp? CashOutClassification_CashOutType_GeneralLookUp { get; set; }
+    public GeneralLookup? CashOutClassification_CashOutType_GeneralLookUp { get; set; }
 
     /// <summary>
     /// Gets or sets the council zoning category entity associated with the cash-out classification.

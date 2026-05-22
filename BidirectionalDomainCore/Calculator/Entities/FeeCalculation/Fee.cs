@@ -28,4 +28,7 @@ public class Fee : BaseAuditableEntity
 
     /// <summary>Gets or sets a value indicating whether the fee is independent.</summary>
     public bool ISIndependent { get; set; }
+
+    /// <summary>Gets or sets floor fee limits per loan type.</summary>
+    public ICollection<FeeFloorByLoanType> FeeFloorByLoanTypes { get; set; } = [];
 }

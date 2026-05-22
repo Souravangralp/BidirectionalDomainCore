@@ -22,6 +22,16 @@ public class IndustryClassification : BaseAuditableEntity
     public string? PPSRDescription { get; set; }
 
     /// <summary>
+    /// Gets or sets the general lookup ID for the loan type from the core database.
+    /// </summary>
+    public int? LoanType_CoreDB_GeneralLookUpID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the general lookup ID for the industry type from the core database.
+    /// </summary>
+    public int? IndustryType_CoreDB_GeneralLookUpID { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of documents associated with the industry classification.
     /// </summary>
     public List<Document> Documents { get; set; } = new List<Document>();

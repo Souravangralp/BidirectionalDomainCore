@@ -23,5 +23,5 @@ public class PostcodeSuburbMapper : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the postcode entity associated with this mapping.
     /// </summary>
-    public Postcode? PostcodeSuburbMapper_Postcode { get; set; }
+    public Bidirectional.DomainCore.BidOnboard.Entities.Generals.Countries.Postcode? PostcodeSuburbMapper_Postcode { get; set; }
 }

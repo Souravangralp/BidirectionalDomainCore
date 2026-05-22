@@ -1,4 +1,5 @@
 using Bidirectional.DomainCore.BidOnboard.Entities.Modules;
+using Bidirectional.DomainCore.ProductMatrix.Entities;
 
 namespace Bidirectional.DomainCore.BidOnboard.Entities;
 
@@ -10,12 +11,17 @@ public class AuditLog : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the name of the table affected by the audited action.
     /// </summary>
-    public string? AffectedTableName { get; set; }
+    public string? TableName { get; set; }
 
     /// <summary>
     /// Gets or sets the identifier of the user who performed the action.
     /// </summary>
     public string? UserID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the name of the user who performed the action.
+    /// </summary>
+    public string? UserName { get; set; }
 
     /// <summary>
     /// Gets or sets the type identifier of the user.
@@ -43,16 +49,6 @@ public class AuditLog : BaseAuditableEntity
     public string? ChangedKeyValues { get; set; }
 
     /// <summary>
-    /// Gets or sets the previous values before the action was performed.
-    /// </summary>
-    public string? PreviousValues { get; set; }
-
-    /// <summary>
-    /// Gets or sets the current values after the action was performed.
-    /// </summary>
-    public string? CurrentValues { get; set; }
-
-    /// <summary>
     /// Gets or sets the URL that was accessed during the audit event.
     /// </summary>
     public string? AccessedUrl { get; set; }
@@ -65,6 +61,11 @@ public class AuditLog : BaseAuditableEntity
     public string? OrganizationID { get; set; }
 
     public string? BranchID { get; set; }
+
+    /// <summary>
+    /// Gets or sets the detailed information for the audit log entry.
+    /// </summary>
+    public AuditLogDetail? AuditLogDetails { get; set; }
 
     /// <summary>
     /// Gets or sets the module entity associated with the audit log.

@@ -11,6 +11,11 @@ public class CompanyCurrentSecretary : BaseAuditableEntity
     public int? CompanyCurrentSecretary_IntroductionToTheCustomerID { get; set; }
 
     /// <summary>
+    /// Gets or sets the identifier linking the company secretary to the company applicant (Form009).
+    /// </summary>
+    public int? CompanyCurrentSecretary_CompanyApplicantID { get; set; }
+
+    /// <summary>
     /// Gets or sets the full name of the company secretary.
     /// </summary>
     public string? SecretaryFullName { get; set; }
@@ -46,4 +51,9 @@ public class CompanyCurrentSecretary : BaseAuditableEntity
     /// Gets or sets the related introduction to the customer entity.
     /// </summary>
     public IntroductionToTheCustomer? CompanyCurrentSecretary_IntroductionToTheCustomer { get; set; }
+
+    /// <summary>
+    /// Gets or sets the related company applicant for Form009.
+    /// </summary>
+    public CompanyApplicant? CompanyCurrentSecretary_CompanyApplicant { get; set; }
 }

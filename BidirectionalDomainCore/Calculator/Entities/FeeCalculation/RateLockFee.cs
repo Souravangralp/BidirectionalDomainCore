@@ -6,7 +6,7 @@ namespace Bidirectional.DomainCore.Calculator.Entities.FeeCalculation;
 public class RateLockFee : BaseAuditableEntity
 {
     /// <summary>Gets or sets the optional interest type.</summary>
-    public string? InterestType { get; set; }
+    public int? InterestType_GeneralLookUpID { get; set; }
 
     /// <summary>Gets or sets the optional year fixed.</summary>
     public int? YearFixed { get; set; }

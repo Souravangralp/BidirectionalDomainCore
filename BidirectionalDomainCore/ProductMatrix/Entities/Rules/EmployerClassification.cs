@@ -1,3 +1,4 @@
+using Bidirectional.DomainCore.Postcode.Entities.Generals;
 using Bidirectional.DomainCore.ProductMatrix.Entities.Products;
 
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
@@ -31,5 +32,5 @@ public class EmployerClassification : BaseAuditableEntity
     /// Gets or sets the general lookup entity for the employer type.
     /// </summary>
     [ForeignKey(nameof(EmployerType_GeneralLookUpID))]
-    public GeneralLookUp? EmployerType_GeneralLookUp { get; set; }
+    public GeneralLookup? EmployerType_GeneralLookUp { get; set; }
 }

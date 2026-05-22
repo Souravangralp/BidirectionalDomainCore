@@ -1,5 +1,3 @@
-using Bidirectional.DomainCore.ProductMatrix.Entities.Postcodes;
-
 namespace Bidirectional.DomainCore.ProductMatrix.Entities.Rules;
 
 /// <summary>
@@ -35,5 +33,5 @@ public class ZoningTypeClassification : BaseAuditableEntity
     /// <summary>
     /// Gets or sets the associated <see cref="State"/> entity for the zoning type classification.
     /// </summary>
-    public Bidirectional.DomainCore.ProductMatrix.Entities.Postcodes.State? ZoningTypeClassification_State { get; set; }
+    public State? ZoningTypeClassification_State { get; set; }
 }

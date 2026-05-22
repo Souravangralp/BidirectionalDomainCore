@@ -1,6 +1,5 @@
-# Merged Database Operations — Platform Guide
-
-**Audience:** Technical stakeholders, delivery teams, and developers working across the Bidirectional loan origination platform.  
+# Database Operations — Platform Guide
+  
 **Scope:** How database access works after consolidating multiple service databases into one SQL Server database, using the shared **BidirectionalDomainCore** library.  
 **Last updated:** May 2026
 
@@ -43,7 +42,7 @@ Each API still exposes its own thin `ApplicationDbContext`, but that type **inhe
 ```mermaid
 flowchart TB
     subgraph apis [API repositories]
-        Bid[Bid - Main App]
+        Bid[Bidirectional - Main App]
         Calc[Calculator API]
         Post[Postcode API]
         PM[Product Matrix API]
@@ -84,7 +83,7 @@ flowchart TB
 | Repository | Role in merged database model |
 |------------|-------------------------------|
 | **Bidirectional-Domain-Core** | **Source of truth** — entities, `PlatformDbContext`, migrations, Key Vault helpers, interceptors, schema conventions |
-| **Bid** (main app) | Broker/admin workflows; largest share of `BidOnboard` entities |
+| **Bidirectional** (main app) | Broker/admin workflows; largest share of `BidOnboard` entities |
 | **Calculator API** | Rates, fees, matrices, discounts (`Calculator` module) |
 | **Postcode API** | Postcode tiers, suburbs, classifications (`Postcode` module) |
 | **Product Matrix API** | Product rules and classifications (`ProductMatrix` module) |
@@ -100,19 +99,7 @@ flowchart TB
 
 `BidirectionalDomainCore` is a class library that replaces duplicated `Domain` + `Infrastructure` entity/migration code that previously existed in each API. It is referenced via **project reference** from consuming repos (paths such as `..\..\..\Bidirectional-Domain-Core\BidirectionalDomainCore\BidirectionalDomainCore\BidirectionalDomainCore.csproj`). The layout is suitable for publishing as an internal **NuGet package** so all services pin the same domain version.
 
-### 5.2 Module layout (logical ownership)
-
-Entities are grouped by top-level folder under the project. Namespace segment after `Bidirectional.DomainCore` determines module ownership:
-
-| Folder / module | Typical contents | SQL schema name (see §7) |
-|-----------------|------------------|---------------------------|
-| `BidOnboard/` | Loan applications, users, orgs, assessment, audit, **onboarding** tables | `bidOnboard` |
-| `Calculator/` | Products, fees, rates, loadings, approvals | `calculator` |
-| `Postcode/` | Postcodes, suburbs, classifications | `postcode` |
-| `ProductMatrix/` | Rule/classification entities | `productMatrix` |
-| `Common/` | Shared primitives (`BaseAuditableEntity`, enums, utilities) | `shared` (when registered) |
-
-### 5.3 What was removed from API `Domain` projects
+### 5.2 What was removed from API `Domain` projects
 
 Per-service copies of entities, constants, interceptors, and local EF migrations were **deleted** in favour of Domain Core types (see git history on `dbMerging` branches). API `Application` layers import Domain Core types via `GlobalUsings` and project references.
 
@@ -133,7 +120,8 @@ Per-service copies of entities, constants, interceptors, and local EF migrations
 | `Persistence/PlatformDbContext.Audit.cs` | Audit-related sets |
 | `Persistence/PlatformDbContextFactory.cs` | Design-time factory for migrations |
 
-All modules share **one** EF model snapshot: `Migrations/PlatformDbContextModelSnapshot.cs`.
+All modules share **one** EF model snapshot: `Migrations/Platfor
+mDbContextModelSnapshot.cs`.
 
 ### 6.2 Model configuration highlights
 

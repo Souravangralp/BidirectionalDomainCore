@@ -1913,7 +1913,7 @@ public partial class PlatformDbContext : DbContext
         {
             DisplayStates(ChangeTracker.Entries());
 
-            //var auditEntries = OnBeforeSaveChanges();
+            //List<AuditEntry> auditEntries = OnBeforeSaveChanges();
 
             int result = await base.SaveChangesAsync(cancellationToken);
 
@@ -1928,21 +1928,6 @@ public partial class PlatformDbContext : DbContext
             throw new Exception(ex.InnerException?.Message ?? ex.Message, ex);
         }
     }
-
-    //public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    //{
-    //    DisplayStates(ChangeTracker.Entries());
-
-    //    var auditEntries = OnBeforeSaveChanges();
-
-    //    var result = await base.SaveChangesAsync(cancellationToken);
-
-    //    await OnAfterSaveChanges(auditEntries, cancellationToken);
-
-    //    await _mediator.DispatchDomainEvents(this);
-
-    //    return result;
-    //}
 
     /// <summary>
     /// Executes a stored procedure asynchronously and maps the result set to a strongly-typed list.

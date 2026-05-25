@@ -44,8 +44,9 @@ public class AuditLog : BaseAuditableEntity
     public string? UserIPAddress { get; set; }
 
     /// <summary>
-    /// Gets or sets the changed key values in the audited action.
+    /// Gets or sets the changed key values in the audited action, as JSON payload.
     /// </summary>
+    [TextClass(TextFieldClass.JsonPayload)]
     public string? ChangedKeyValues { get; set; }
 
     /// <summary>

@@ -11,13 +11,15 @@ public class AuditLogDetail : BaseAuditableEntity
     public int? AuditLogDetail_AuditLogID { get; set; }
 
     /// <summary>
-    /// Gets or sets the value before the change occurred.
+    /// Gets or sets the value before the change occurred, as JSON payload.
     /// </summary>
+    [TextClass(TextFieldClass.JsonPayload)]
     public string? OldValue { get; set; }
 
     /// <summary>
-    /// Gets or sets the value after the change occurred.
+    /// Gets or sets the value after the change occurred, as JSON payload.
     /// </summary>
+    [TextClass(TextFieldClass.JsonPayload)]
     public string? NewValue { get; set; }
 
     /// <summary>
